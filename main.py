@@ -252,3 +252,22 @@ def handle_message(message):
             bot.send_message(chat_id, "Сначала используй /adventure чтобы начать новое приключение! 🏙️")
         else:
             bot.send_message(chat_id, "Используй /adventure чтобы начать новое приключение! 🏙️")
+@bot.callback_query_handler(func=lambda call: True)
+def handle_callback(call):
+    """Обработчик callback-запросов от inline кнопок"""
+    if call.data == "new_adventure":
+        # Удаляем предыдущее сообщение с кнопкой
+        try:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+        except:
+            pass
+        # Запускаем создание нового приключения
+        start_adventure(call.message)
+
+def main():
+    """Запуск бота"""
+    print("Бот UrbanExplorer запущен!")
+    bot.infinity_polling()
+
+if __name__ == "__main__":
+    main()
