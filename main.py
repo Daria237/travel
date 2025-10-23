@@ -105,3 +105,48 @@ def _load_additional_tasks(self) -> Dict:
                 "Спроси у кассира, какое мероприятие они больше всего ждут"
             ]
         }
+
+
+def generate_adventure(self, adventure_type: str, district: str) -> Dict:
+    """Генерация приключения по выбранным параметрам"""
+    # Выбираем 3 случайных пункта маршрута
+    routes = self.adventure_data[adventure_type][district]
+    selected_routes = random.sample(routes, min(3, len(routes)))
+
+    # Выбираем 3 случайных дополнительных задания
+    tasks = self.additional_tasks[adventure_type]
+    selected_tasks = random.sample(tasks, min(3, len(tasks)))
+
+    return {
+        "type": adventure_type,
+        "type_name": self.type_names[adventure_type],
+        "district": district,
+        "district_name": self.district_names[district],
+        "routes": selected_routes,
+        "tasks": selected_tasks
+    }
+
+
+def format_adventure_message(self, adventure: Dict) -> str:
+    """Форматирование приключения в текст для сообщения"""
+    message = "🎊" * 10 + " ВАШ ПЕРСОНАЛЬНЫЙ КВЕСТ! " + "🎊" * 10
+    message += f"\n\n🏷  Стиль: {adventure['type_name']}"
+    message += f"\n📍 Район: {adventure['district_name']}"
+
+    message += f"\n\n🗺  ВАШ МАРШРУТ:"
+    for i, route in enumerate(adventure['routes'], 1):
+        message += f"\n   {i}. {route}"
+
+    message += f"\n\n🎯 ДОПОЛНИТЕЛЬНЫЕ ЗАДАНИЯ:"
+    for i, task in enumerate(adventure['tasks'], 1):
+        message += f"\n   • {task}"
+
+    # Случайное время прогулки
+    times = ["~2 часа", "~2.5 часа", "~3 часа", "~1.5 часа"]
+    message += f"\n\n⏱  Время прогулки: {random.choice(times)}"
+
+    message += "\n\n" + "✨" * 15
+    message += "\n   Хорошего приключения в Нижнем!"
+    message += "\n" + "✨" * 15
+
+    return message
