@@ -190,3 +190,65 @@ def start_adventure(message):
     
     # Сохраняем состояние пользователя
     user_states[chat_id] = {"step": "choose_type"}
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    """Обработчик всех текстовых сообщений"""
+    chat_id = message.chat.id
+    user_state = user_states.get(chat_id, {})
+    text = message.text.strip()
+    
+    if user_state.get("step") == "choose_type":
+        # Пользователь выбирает тип приключения
+        if text in explorer.adventure_types:
+            adventure_type = explorer.adventure_types[text]
+            user_states[chat_id] = {
+                "step": "choose_district", 
+                "adventure_type": adventure_type
+            }
+            
+            # Отправляем список районов
+            district_list = """
+📍 ВЫБЕРИ РАЙОН (отправь цифру от 1 до 3):
+
+1 - Нижегородский
+2 - Советский
+3 - Приокский
+
+Отправь цифру выбранного района:
+            """
+            
+            bot.send_message(chat_id, district_list)
+        else:
+            bot.send_message(chat_id, "❌ Неверный выбор. Пожалуйста, отправь цифру от 1 до 4:")
+    
+    elif user_state.get("step") == "choose_district":
+        # Пользователь выбирает район
+        if text in explorer.districts:
+            district = explorer.districts[text]
+            adventure_type = user_state["adventure_type"]
+            
+            # Генерируем приключение
+            adventure = explorer.generate_adventure(adventure_type, district)
+            
+            # Форматируем и отправляем результат
+            adventure_message = explorer.format_adventure_message(adventure)
+            
+            bot.send_message(chat_id, adventure_message)
+            
+            # Предлагаем создать новое приключение
+            markup = telebot.types.InlineKeyboardMarkup()
+            markup.add(telebot.types.InlineKeyboardButton("🎪 Создать новое приключение", callback_data="new_adventure"))
+            
+            bot.send_message(chat_id, "Хочешь создать еще одно приключение?", reply_markup=markup)
+            
+            # Очищаем состояние пользователя
+            user_states.pop(chat_id, None)
+        else:
+            bot.send_message(chat_id, "❌ Неверный выбор. Пожалуйста, отправь цифру от 1 до 3:")
+    
+    else:
+        # Если пользователь просто отправил сообщение без контекста
+        if text.isdigit():
+            bot.send_message(chat_id, "Сначала используй /adventure чтобы начать новое приключение! 🏙️")
+        else:
+            bot.send_message(chat_id, "Используй /adventure чтобы начать новое приключение! 🏙️")
