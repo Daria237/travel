@@ -1,8 +1,9 @@
 import random
 import telebot
 from typing import Dict, List, Tuple
-
-BOT_TOKEN = '8266335546:AAGi3S6qoOtIQ07xMV-az8x053zl1uNwzr8'
+from dotenv import load_dotenv
+load_dotenv()
+BOT_TOKEN = os.getenv('TOKEN')
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
