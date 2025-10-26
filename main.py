@@ -1,5 +1,6 @@
 import random
 import telebot
+import os
 from typing import Dict, List, Tuple
 from dotenv import load_dotenv
 load_dotenv()
